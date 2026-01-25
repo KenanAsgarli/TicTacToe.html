@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonsuz Tic Tac Toe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .winning-square { background-color: #dcfce7 !important; border-color: #4ade80 !important; transform: scale(1.05); }
+        .next-to-go { opacity: 0.5; position: relative; }
+        .next-to-go::after { content: "⚠️"; position: absolute; top: 2px; right: 2px; font-size: 12px; }
+        .square { transition: all 0.2s; }
+        .square:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col items-center justify-center p-4 font-sans text-slate-800">
+
+    <div class="mb-8 text-center space-y-2">
+        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">Sonsuz Tic Tac Toe</h1>
+        <p class="text-slate-500 font-medium">Hər oyunçunun maksimum 3 daşı ola bilər!</p>
+    </div>
+
+    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-100 max-w-md w-full">
+        <div class="flex items-center justify-between mb-8 px-2">
+            <div id="status-container" class="flex items-center space-x-2">
+                </div>
+            <button onclick="resetGame()" class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
+                <i data-lucide="rotate-ccw"></i>
+            </button>
+        </div>
+
+        <div id="board" class="grid grid-cols-3 gap-3 sm:gap-4 mx-auto w-fit mb-2">
+            </div>
+
+        <div class="mt-8 text-center h-6">
+            <span id="footer-msg" class="text-sm font-medium text-slate-400">Oyuna başlamaq üçün bir xanaya toxun</span>
+        </div>
+    </div>
+
+    <script>
+        let squares = Array(9).fill(null);
+        let xIsNext = true;
+        let xMoves = [];
+        let oMoves = [];
+        let gameStatus = 'playing'; // 'playing', 'won'
+        let winningLine = null;
+
+        function calculateWinner(sq) {
+            const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            for (let line of lines) {
+                const [a, b, c] = line;
+                if (sq[a] && sq[a] === sq[b] && sq[a] === sq[c]) return line;
+            }
+            return null;
+        }
+
+        function handleClick(i) {
+            if (squares[i] || gameStatus !== 'playing') return;
+
+            let currentMoves = xIsNext ? xMoves : oMoves;
+            
+            // Əgər 3 daş varsa, ən köhnəsini sil
+            if (currentMoves.length === 3) {
+                const oldestMove = currentMoves.shift();
+                squares[oldestMove] = null;
+            }
+
+            squares[i] = xIsNext ? 'X' : 'O';
+            currentMoves.push(i);
+
+            const winLine = calculateWinner(squares);
+            if (winLine) {
+                gameStatus = 'won';
+                winningLine = winLine;
+            } else {
+                xIsNext = !xIsNext;
+            }
+
+            render();
+        }
+
+        function resetGame() {
+            squares = Array(9).fill(null);
+            xMoves = [];
+            oMoves = [];
+            xIsNext = true;
+            gameStatus = 'playing';
+            winningLine = null;
+            render();
+        }
+
+        function render() {
+            const board = document.getElementById('board');
+            const statusContainer = document.getElementById('status-container');
+            const footerMsg = document.getElementById('footer-msg');
+            board.innerHTML = '';
+
+            // Növbəti silinəcək daşı tap
+            const nextToGo = gameStatus === 'playing' ? (xIsNext ? (xMoves.length === 3 ? xMoves[0] : null) : (oMoves.length === 3 ? oMoves[0] : null)) : null;
+
+            squares.forEach((val, i) => {
+                const btn = document.createElement('button');
+                btn.className = `square h-20 w-20 sm:h-24 sm:w-24 bg-white rounded-xl shadow-sm border-2 border-slate-200 flex items-center justify-center text-4xl sm:text-5xl`;
+                
+                if (winningLine?.includes(i)) btn.classList.add('winning-square');
+                if (i === nextToGo) btn.classList.add('next-to-go');
+                if (!val && gameStatus === 'playing') btn.classList.add('hover:bg-slate-50', 'cursor-pointer');
+
+                if (val === 'X') {
+                    btn.innerHTML = `<i data-lucide="x" class="${winningLine?.includes(i) ? 'text-green-600' : 'text-indigo-500'} w-12 h-12" stroke-width="2.5"></i>`;
+                } else if (val === 'O') {
+                    btn.innerHTML = `<i data-lucide="circle" class="${winningLine?.includes(i) ? 'text-green-600' : 'text-rose-500'} w-10 h-10" stroke-width="3"></i>`;
+                }
+
+                btn.onclick = () => handleClick(i);
+                board.appendChild(btn);
+            });
+
+            if (gameStatus === 'won') {
+                statusContainer.innerHTML = `<div class="flex items-center space-x-2 text-lg font-bold text-green-600"><i data-lucide="trophy"></i><span>Qalib: ${xIsNext ? 'X' : 'O'}!</span></div>`;
+                footerMsg.innerText = "Yenidən oynamaq üçün təmizləmə düyməsinə bas";
+            } else {
+                statusContainer.innerHTML = `
+                    <div class="px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1 ${xIsNext ? 'bg-indigo-100 text-indigo-700 ring-2 ring-indigo-500' : 'bg-slate-100 text-slate-400'}"><span>X Player</span></div>
+                    <div class="px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1 ${!xIsNext ? 'bg-rose-100 text-rose-700 ring-2 ring-rose-500' : 'bg-slate-100 text-slate-400'}"><span>O Player</span></div>
+                `;
+                footerMsg.innerText = nextToGo !== null ? "Növbəti gediş köhnə daşı siləcək!" : "Hər iki tərəf 3 daş qoyana qədər davam edin.";
+            }
+            
+            lucide.createIcons();
+        }
+
+        render();
+    </script>
+</body>
+</html>
