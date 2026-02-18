@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sonsuz Tic Tac Toe</title>
+    <title>Infinite Tic Tac Toe</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -17,8 +17,8 @@
 <body class="bg-slate-50 min-h-screen flex flex-col items-center justify-center p-4 font-sans text-slate-800">
 
     <div class="mb-8 text-center space-y-2">
-        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">Sonsuz Tic Tac Toe</h1>
-        <p class="text-slate-500 font-medium">Hər oyunçunun maksimum 3 daşı ola bilər!</p>
+        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">Infinite Tic Tac Toe</h1>
+        <p class="text-slate-500 font-medium">Each player can state just 3 place!</p>
     </div>
 
     <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-100 max-w-md w-full">
@@ -34,7 +34,7 @@
             </div>
 
         <div class="mt-8 text-center h-6">
-            <span id="footer-msg" class="text-sm font-medium text-slate-400">Oyuna başlamaq üçün bir xanaya toxun</span>
+            <span id="footer-msg" class="text-sm font-medium text-slate-400">Select a blank cell to start the game</span>
         </div>
     </div>
 
@@ -119,13 +119,13 @@
 
             if (gameStatus === 'won') {
                 statusContainer.innerHTML = `<div class="flex items-center space-x-2 text-lg font-bold text-green-600"><i data-lucide="trophy"></i><span>Qalib: ${xIsNext ? 'X' : 'O'}!</span></div>`;
-                footerMsg.innerText = "Yenidən oynamaq üçün təmizləmə düyməsinə bas";
+                footerMsg.innerText = "Click clean button for play a new game";
             } else {
                 statusContainer.innerHTML = `
                     <div class="px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1 ${xIsNext ? 'bg-indigo-100 text-indigo-700 ring-2 ring-indigo-500' : 'bg-slate-100 text-slate-400'}"><span>X Player</span></div>
                     <div class="px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1 ${!xIsNext ? 'bg-rose-100 text-rose-700 ring-2 ring-rose-500' : 'bg-slate-100 text-slate-400'}"><span>O Player</span></div>
                 `;
-                footerMsg.innerText = nextToGo !== null ? "Növbəti gediş köhnə daşı siləcək!" : "Hər iki tərəf 3 daş qoyana qədər davam edin.";
+                footerMsg.innerText = nextToGo !== null ? "After 3 moves, your first move will be deleted!" : "Continue until each sides have filled 3 cells.";
             }
             
             lucide.createIcons();
